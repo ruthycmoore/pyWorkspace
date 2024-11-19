@@ -1,0 +1,101 @@
+import sys
+
+# Constants for the board size
+BOARD_SIZE = 8
+PIECES = {
+    'king': 'K', 'queen': 'Q', 'rook': 'R', 'bishop': 'B', 'knight': 'N', 'pawn': 'P'
+}
+
+# Starting positions for the pieces
+STARTING_BOARD = [
+    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+    ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.'],
+    ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+]
+
+# Function to display the current board
+def print_board(board):
+    print("  a b c d e f g h")
+    print(" +----------------")
+    row_num = 8
+    for row in board:
+        print(f"{row_num}| " + " ".join(row))
+        row_num -= 1
+
+# Convert algebraic notation (e.g., 'e2') to board indices
+def position_to_index(pos):
+    col = ord(pos[0]) - ord('a')
+    row = 8 - int(pos[1])
+    return row, col
+
+# Check if the move is within bounds of the board
+def in_bounds(row, col):
+    return 0 <= row < BOARD_SIZE and 0 <= col < BOARD_SIZE
+
+# Function to check if the move is valid (basic check)
+def is_valid_move(board, start, end, player):
+    start_row, start_col = position_to_index(start)
+    end_row, end_col = position_to_index(end)
+
+    # Check if starting position is valid
+    piece = board[start_row][start_col]
+    if piece == '.':
+        print("No piece at the starting position!")
+        return False
+
+    # Check if the move is within bounds
+    if not in_bounds(end_row, end_col):
+        print("End position out of bounds!")
+        return False
+
+    # Check if moving to a square occupied by the same color piece
+    if player == 'white' and piece.islower():
+        print("Cannot move to a square occupied by your own piece!")
+        return False
+    if player == 'black' and piece.isupper():
+        print("Cannot move to a square occupied by your own piece!")
+        return False
+
+    # Here we would include more sophisticated movement logic for each piece
+    # For simplicity, we'll allow all moves without detailed validation.
+    return True
+
+# Main game loop
+def play_game():
+    board = [row[:] for row in STARTING_BOARD]
+    turn = 'white'
+
+    while True:
+        print_board(board)
+        print(f"{turn.capitalize()}'s turn.")
+        
+        # Get input from the current player
+        start_pos = input(f"Enter the starting position (e.g., 'e2'): ").lower()
+        end_pos = input(f"Enter the ending position (e.g., 'e4'): ").lower()
+
+        if not start_pos or not end_pos:
+            print("Invalid input, please enter a valid move.")
+            continue
+        
+        if not is_valid_move(board, start_pos, end_pos, turn):
+            continue
+        
+        # Convert positions to indices and make the move
+        start_row, start_col = position_to_index(start_pos)
+        end_row, end_col = position_to_index(end_pos)
+
+        # Move the piece on the board
+        piece = board[start_row][start_col]
+        board[end_row][end_col] = piece
+        board[start_row][start_col] = '.'
+
+        # Switch turns
+        turn = 'black' if turn == 'white' else 'white'
+
+if __name__ == '__main__':
+    play_game()
